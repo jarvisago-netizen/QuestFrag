@@ -2,985 +2,246 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>QuestFrag — Stop Wasting Your Session. Start Dominating It.</title>
-    <meta name="description" content="Tell QuestFrag how long you have. Get the exact quests to max XP, coins, and rewards — right now.">
-
-    <!-- Analytics: Cloudflare Web Analytics placeholder -->
-    <!-- <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "YOUR_CF_TOKEN"}'></script> -->
-
-    <!-- Analytics: Google Analytics placeholder -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    </script> -->
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuestFrag — AI Gaming Assistant | Stop Grinding. Start Winning.</title>
     <style>
-        /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --gold: #FFD700;
-            --gold-dim: #b8960c;
-            --gold-glow: rgba(255, 215, 0, 0.25);
+            --purple: #7c3aed;
+            --cyan: #06b6d4;
             --bg: #0a0a0f;
-            --bg-card: #1a0a2e;
-            --bg-secondary: #1a1a2e;
-            --purple-deep: #1a0a2e;
-            --purple-glow: rgba(26, 10, 46, 0.6);
-            --text: #e8e8ef;
-            --text-muted: #8888a0;
-            --border: rgba(255, 215, 0, 0.12);
-            --border-hover: rgba(255, 215, 0, 0.4);
-            --radius: 14px;
+            --card-bg: #111118;
+            --text: #e4e4e7;
+            --text-muted: #a1a1aa;
         }
 
-        html { scroll-behavior: smooth; }
-
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
-            min-width: 375px;
         }
 
-        /* ===== ANIMATED HEX GRID BACKGROUND ===== */
-        .hex-bg {
+        /* Grid background */
+        body::before {
+            content: '';
             position: fixed;
             inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
         }
-        .hex-bg canvas { width: 100%; height: 100%; }
 
-        /* ===== LAYOUT ===== */
-        .container { max-width: 1120px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-        /* ===== NAV ===== */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            padding: 16px 20px;
-            background: rgba(10, 10, 15, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.06);
-        }
-        .nav-inner {
-            max-width: 1120px;
-            margin: 0 auto;
+        /* NAV */
+        nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
         }
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: #fff;
-            font-weight: 900;
-            font-size: 1.3rem;
-            letter-spacing: -0.5px;
-        }
-        .nav-logo .logo-icon {
-            width: 34px;
-            height: 34px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: #0a0a0f;
-        }
+        .logo { font-size: 1.25rem; font-weight: 700; color: #fff; text-decoration: none; }
         .nav-cta {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
+            background: var(--purple);
+            color: #fff;
             padding: 8px 20px;
             border-radius: 8px;
             text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            transition: all 0.25s;
-        }
-        .nav-cta:hover {
-            background: var(--gold);
-            color: #0a0a0f;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
 
-        /* ===== HERO ===== */
+        /* HERO */
         .hero {
             text-align: center;
-            padding: 160px 20px 100px;
-            position: relative;
-            z-index: 1;
+            padding: 80px 24px 60px;
         }
-        .hero-glow {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 400px;
-            background: radial-gradient(ellipse, rgba(255, 215, 0, 0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        /* GAME TICKER */
-        .ticker-wrap {
-            overflow: hidden;
-            margin-bottom: 40px;
-            mask-image: linear-gradient(90deg, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(90deg, transparent, black 15%, black 85%, transparent);
-        }
-        .ticker {
-            display: flex;
-            gap: 48px;
-            animation: ticker-scroll 20s linear infinite;
-            width: max-content;
-        }
-        .ticker span {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        .hero h1 {
-            font-size: clamp(2.8rem, 7vw, 4.2rem);
-            font-weight: 900;
-            line-height: 1.05;
-            letter-spacing: -1.5px;
-            margin-bottom: 24px;
-            color: #fff;
-        }
-        .hero h1 .gold { color: var(--gold); }
-        .hero .sub {
-            color: var(--text-muted);
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            max-width: 620px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-
-        /* PULSING CTA */
-        .cta-primary {
+        .badge {
             display: inline-block;
-            background: linear-gradient(135deg, var(--gold), #f0c000);
-            color: #0a0a0f;
-            padding: 16px 40px;
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--purple);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff, var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 32px;
+            font-size: 1.1rem;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--purple);
+            color: #fff;
+            padding: 14px 32px;
             border-radius: 12px;
             text-decoration: none;
-            font-weight: 900;
-            font-size: 1.05rem;
-            letter-spacing: 0.3px;
-            border: none;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.2s;
+            font-weight: 700;
+            font-size: 1rem;
         }
-        .cta-primary:hover { transform: translateY(-2px); }
-        .cta-primary::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 16px;
-            background: var(--gold);
-            opacity: 0;
-            z-index: -1;
-            animation: cta-pulse 2.5s ease-in-out infinite;
-        }
-        @keyframes cta-pulse {
-            0%, 100% { opacity: 0; filter: blur(12px); }
-            50% { opacity: 0.3; filter: blur(18px); }
-        }
-
-        /* PARTICLE BURST ON CTA HOVER */
-        .cta-primary {
-            overflow: visible;
-        }
-        .cta-primary .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--gold);
-            pointer-events: none;
-            opacity: 0;
-        }
-        @keyframes particle-burst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { opacity: 0; }
-        }
-        .cta-primary:hover .particle,
-        .cta-primary:active .particle {
-            animation: particle-burst 0.6s ease-out forwards;
-        }
-        .cta-primary:hover .p1, .cta-primary:active .p1 { animation-delay: 0s; --px: -24px; --py: -28px; }
-        .cta-primary:hover .p2, .cta-primary:active .p2 { animation-delay: 0.05s; --px: 20px; --py: -32px; }
-        .cta-primary:hover .p3, .cta-primary:active .p3 { animation-delay: 0.02s; --px: -30px; --py: 10px; }
-        .cta-primary:hover .p4, .cta-primary:active .p4 { animation-delay: 0.08s; --px: 28px; --py: 14px; }
-        .cta-primary:hover .p5, .cta-primary:active .p5 { animation-delay: 0.04s; --px: 0px; --py: -36px; }
-        .cta-primary:hover .p6, .cta-primary:active .p6 { animation-delay: 0.06s; --px: -18px; --py: 24px; }
-        .cta-primary:hover .p7, .cta-primary:active .p7 { animation-delay: 0.1s; --px: 32px; --py: -10px; }
-        .cta-primary:hover .p8, .cta-primary:active .p8 { animation-delay: 0.03s; --px: -8px; --py: -34px; }
-        .particle.p1 { top: 0; left: 20%; }
-        .particle.p2 { top: 0; right: 20%; }
-        .particle.p3 { bottom: 0; left: 10%; }
-        .particle.p4 { bottom: 0; right: 10%; }
-        .particle.p5 { top: -4px; left: 50%; }
-        .particle.p6 { bottom: -4px; left: 40%; }
-        .particle.p7 { top: 50%; right: -4px; }
-        .particle.p8 { top: 50%; left: -4px; }
-        @keyframes particle-burst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; filter: blur(0); }
-            50% { opacity: 0.8; }
-            100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; filter: blur(2px); }
-        }
-
-        /* RANK TIER BADGE */
-        .quest-rank {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-            letter-spacing: -0.5px;
-            border: 2px solid;
-        }
-        .quest-rank.rank-s { background: rgba(255, 215, 0, 0.15); border-color: var(--gold); color: var(--gold); }
-        .quest-rank.rank-a { background: rgba(192, 192, 192, 0.12); border-color: #c0c0c0; color: #c0c0c0; }
-        .quest-rank.rank-b { background: rgba(205, 127, 50, 0.12); border-color: #cd7f32; color: #cd7f32; }
-
-        /* NAV TAGLINE */
-        .nav-brand-wrap { display: flex; flex-direction: column; gap: 0; }
-        .nav-tagline {
-            color: var(--gold);
-            font-size: 0.6rem;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-left: 44px;
-            opacity: 0.85;
-        }
-
-        .hero-note {
+        .cta-sub {
             color: var(--text-muted);
             font-size: 0.8rem;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
-        /* ===== SECTION STYLES ===== */
-        section {
-            padding: 100px 0;
-            position: relative;
-            z-index: 1;
-        }
-        .section-label {
-            color: var(--gold);
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-align: center;
-            margin-bottom: 12px;
-        }
+        /* SECTIONS */
+        section { padding: 80px 0; }
         .section-title {
             text-align: center;
-            font-size: clamp(1.7rem, 4vw, 2.5rem);
-            font-weight: 900;
-            color: #fff;
-            letter-spacing: -0.5px;
-            margin-bottom: 16px;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
         .section-sub {
             text-align: center;
             color: var(--text-muted);
-            max-width: 540px;
-            margin: 0 auto 56px;
-            font-size: 1rem;
+            margin-bottom: 48px;
         }
 
-        /* ===== FADE-IN ON SCROLL ===== */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ===== PROBLEM SECTION ===== */
-        .problems {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .problem-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+        /* STEPS */
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .step {
+            background: var(--card-bg);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 16px;
             padding: 32px 24px;
-            text-align: center;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .problem-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.08);
-        }
-        .problem-icon {
-            font-size: 2.2rem;
-            margin-bottom: 16px;
-            display: block;
-        }
-        .problem-card h3 {
-            font-size: 1.1rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        .problem-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* ===== DEMO SECTION ===== */
-        .demo-section {
-            background: linear-gradient(180deg, rgba(26, 10, 46, 0.5) 0%, rgba(26, 10, 46, 0.2) 50%, transparent 100%);
-            border-top: 1px solid rgba(255, 215, 0, 0.05);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.05);
-        }
-        .demo-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 640px;
-            margin: 0 auto;
-        }
-        .quest-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .quest-card.loaded {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .quest-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 0 24px rgba(255, 215, 0, 0.07);
-        }
-
-        /* Shimmer loading effect */
-        .quest-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.04), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 2s ease-in-out infinite;
-        }
-        .quest-card.loaded::before { animation: none; opacity: 0; }
-
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
-        }
-
-        .quest-priority {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1rem;
-            flex-shrink: 0;
-            color: #0a0a0f;
-        }
-        .quest-priority.p1 { background: linear-gradient(135deg, var(--gold), #f0c000); }
-        .quest-priority.p2 { background: linear-gradient(135deg, #c0c0c0, #a0a0b0); }
-        .quest-priority.p3 { background: linear-gradient(135deg, #cd7f32, #a06020); }
-        .quest-priority.p4 { background: linear-gradient(135deg, #607080, #4a5868); }
-        .quest-priority.p5 { background: linear-gradient(135deg, #505060, #404050); }
-
-        .quest-info { flex: 1; min-width: 0; }
-        .quest-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .quest-meta {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-        .quest-meta .xp { color: var(--gold); font-weight: 700; }
-        .quest-meta .time { color: #8888a0; }
-        .quest-meta .efficiency { color: #50c878; font-weight: 600; }
-
-        .quest-badge {
-            background: rgba(255, 215, 0, 0.1);
-            color: var(--gold);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            flex-shrink: 0;
-        }
-
-        /* ===== HOW IT WORKS ===== */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-        .step-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 36px 28px;
-            text-align: center;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .step-card:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.08);
         }
         .step-num {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-            color: #0a0a0f;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-        .step-card h3 {
-            font-size: 1.15rem;
-            font-weight: 800;
-            margin-bottom: 10px;
+            display: inline-block;
+            background: var(--purple);
             color: #fff;
-        }
-        .step-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* ===== SUPPORTED GAMES ===== */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .game-tile {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px 16px;
+            width: 32px; height: 32px;
+            border-radius: 8px;
             text-align: center;
-            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-        }
-        .game-tile:hover {
-            border-color: var(--border-hover);
-            box-shadow: 0 0 24px rgba(255, 215, 0, 0.08);
-            transform: translateY(-4px);
-        }
-        .game-tile .game-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-        .game-tile .game-name {
+            line-height: 32px;
             font-weight: 700;
-            font-size: 0.85rem;
-            color: #fff;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
         }
-        .game-tile .game-status {
-            font-size: 0.7rem;
-            color: var(--gold);
-            font-weight: 600;
-            margin-top: 4px;
-        }
-        .game-tile .game-status.soon {
-            color: var(--text-muted);
-        }
+        .step h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .step p { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* ===== WAITLIST ===== */
-        .waitlist-section {
-            background: linear-gradient(180deg, transparent 0%, rgba(26, 10, 46, 0.5) 50%, transparent 100%);
+        /* FEATURES */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .feature {
+            background: var(--card-bg);
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            border-radius: 16px;
+            padding: 32px 24px;
         }
-        .waitlist-box {
-            max-width: 520px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .email-form {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-        }
-        .email-input {
-            flex: 1;
-            padding: 14px 18px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: #fff;
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .email-input::placeholder { color: var(--text-muted); }
-        .email-input:focus { border-color: var(--gold); }
-        .email-submit {
-            background: linear-gradient(135deg, var(--gold), #f0c000);
-            color: #0a0a0f;
-            padding: 14px 28px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 900;
-            font-size: 0.9rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: transform 0.2s;
-            font-family: inherit;
-        }
-        .email-submit:hover { transform: translateY(-2px); }
-        .form-note {
-            color: var(--text-muted);
-            font-size: 0.75rem;
+        .feature h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .feature p { color: var(--text-muted); font-size: 0.9rem; }
+        .tag {
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--cyan);
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
             margin-top: 12px;
         }
-        .form-success {
-            display: none;
-            color: var(--gold);
-            font-weight: 700;
-            font-size: 1rem;
-            margin-top: 16px;
-        }
 
-        /* ===== FOOTER ===== */
+        /* CTA SECTION */
+        .cta-section { text-align: center; }
+
+        /* FOOTER */
         footer {
-            border-top: 1px solid rgba(255, 215, 0, 0.06);
-            padding: 40px 20px;
             text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        .footer-logo {
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: var(--gold);
-            margin-bottom: 8px;
-        }
-        .footer-text {
+            padding: 40px 24px;
+            border-top: 1px solid rgba(255,255,255,0.05);
             color: var(--text-muted);
-            font-size: 0.78rem;
-        }
-
-        /* ===== MOBILE ===== */
-        @media (max-width: 600px) {
-            .hero { padding: 130px 16px 60px; }
-            .hero h1 { font-size: clamp(2.6rem, 10vw, 3.4rem); letter-spacing: -1.5px; line-height: 1.0; }
-            .hero .sub { font-size: 0.95rem; margin-bottom: 28px; }
-            .hero .cta-primary { font-size: 1.15rem; padding: 18px 44px; width: 100%; max-width: 360px; text-align: center; }
-            section { padding: 72px 0; }
-            .email-form { flex-direction: column; }
-            .email-submit { width: 100%; }
-            .games-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .game-tile { padding: 18px 10px; }
-            .quest-card { padding: 16px; gap: 12px; }
-            .quest-badge { display: none; }
-            .quest-rank { width: 26px; height: 26px; font-size: 0.7rem; }
-            .nav-tagline { font-size: 0.5rem; margin-left: 44px; }
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
 
-<!-- Animated hex grid background -->
-<div class="hex-bg"><canvas id="hexCanvas"></canvas></div>
-
-<!-- NAV -->
-<nav class="nav">
-    <div class="nav-inner">
-        <div class="nav-brand-wrap">
-            <a href="#" class="nav-logo">
-                <div class="logo-icon">QF</div>
-                QuestFrag
-            </a>
-            <span class="nav-tagline">Your session. Optimised.</span>
-        </div>
-        <a href="#waitlist" class="nav-cta">Join Waitlist</a>
-    </div>
+<nav>
+    <a href="#" class="logo">QuestFrag</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
 </nav>
 
-<!-- HERO -->
-<header class="hero">
-    <div class="hero-glow"></div>
+<div class="hero">
+    <div class="badge">Currently building for EAFC · NBA 2K · Fortnite · More coming soon</div>
+    <h1>Stop grinding.<br>Start winning.</h1>
+    <p>QuestFrag is an AI assistant that optimises every minute of your play session. Tell it how long you have, and it gives you the exact plan to maximise XP, coins, and rewards — right now.</p>
+    <a href="#waitlist" class="cta-btn">Get Early Access</a>
+    <p class="cta-sub">Free during early access. No credit card required.</p>
+</div>
 
-    <!-- Animated game ticker -->
-    <div class="ticker-wrap">
-        <div class="ticker" aria-hidden="true">
-            <span>Fortnite</span><span>EAFC</span><span>NBA 2K</span><span>Rocket League</span><span>Destiny 2</span><span>WoW</span><span>Diablo 4</span><span>More Coming</span>
-            <span>Fortnite</span><span>EAFC</span><span>NBA 2K</span><span>Rocket League</span><span>Destiny 2</span><span>WoW</span><span>Diablo 4</span><span>More Coming</span>
-        </div>
-    </div>
-
-    <h1 class="fade-in">Stop wasting your session.<br><span class="gold">Start dominating it.</span></h1>
-    <p class="sub fade-in">Tell QuestFrag how long you have. Get the exact quests to max XP, coins, and rewards &mdash; right now.</p>
-    <a href="#waitlist" class="cta-primary fade-in">Get Early Access &mdash; Free<span class="particle p1"></span><span class="particle p2"></span><span class="particle p3"></span><span class="particle p4"></span><span class="particle p5"></span><span class="particle p6"></span><span class="particle p7"></span><span class="particle p8"></span></a>
-    <p class="hero-note fade-in">No credit card. No spam. Just smarter sessions.</p>
-</header>
-
-<!-- PROBLEM -->
 <section class="container">
-    <div class="section-label fade-in">The problem</div>
-    <h2 class="section-title fade-in">Your gaming time is being wasted</h2>
-    <p class="section-sub fade-in">Most players log in, wander through menus, and log out having barely progressed. Sound familiar?</p>
-    <div class="problems">
-        <div class="problem-card fade-in">
-            <span class="problem-icon">&#9203;</span>
-            <h3>Limited Time, Zero Plan</h3>
-            <p>You have 45 minutes but spend 15 figuring out what to do. By the time you start, half your session is gone.</p>
-        </div>
-        <div class="problem-card fade-in">
-            <span class="problem-icon">&#127922;</span>
-            <h3>Too Many Quests, No Priority</h3>
-            <p>Battle pass, dailies, weeklies, events, challenges &mdash; the game throws everything at you with no clear order.</p>
-        </div>
-        <div class="problem-card fade-in">
-            <span class="problem-icon">&#128169;</span>
-            <h3>Low-Value Grind</h3>
-            <p>You finish a session and realise you spent 40 minutes on a quest worth 500 XP when a 10-minute one gave 5,000.</p>
-        </div>
-    </div>
-</section>
-
-<!-- DEMO -->
-<section class="demo-section" id="demo">
-    <div class="container">
-        <div class="section-label fade-in">Live Demo</div>
-        <h2 class="section-title fade-in">Your next Fortnite hour, optimised</h2>
-        <p class="section-sub fade-in">Here's what QuestFrag generates when you say: "I have 1 hour in Fortnite."</p>
-        <div class="demo-grid">
-            <div class="quest-card" data-delay="0">
-                <div class="quest-priority p1">1</div>
-                <div class="quest-info">
-                    <div class="quest-name">Complete 3 Weekly Bonus Goals</div>
-                    <div class="quest-meta">
-                        <span class="xp">+25,000 XP</span>
-                        <span class="time">18 min</span>
-                        <span class="efficiency">1,389 XP/min</span>
-                    </div>
-                </div>
-                <div class="quest-rank rank-s">S</div>
-                <div class="quest-badge">Best Value</div>
-            </div>
-            <div class="quest-card" data-delay="200">
-                <div class="quest-priority p2">2</div>
-                <div class="quest-info">
-                    <div class="quest-name">Daily Quests: Eliminations + Survival</div>
-                    <div class="quest-meta">
-                        <span class="xp">+15,000 XP</span>
-                        <span class="time">12 min</span>
-                        <span class="efficiency">1,250 XP/min</span>
-                    </div>
-                </div>
-                <div class="quest-rank rank-s">S</div>
-                <div class="quest-badge">Daily</div>
-            </div>
-            <div class="quest-card" data-delay="400">
-                <div class="quest-priority p3">3</div>
-                <div class="quest-info">
-                    <div class="quest-name">Collect Items at Named Locations</div>
-                    <div class="quest-meta">
-                        <span class="xp">+12,000 XP</span>
-                        <span class="time">10 min</span>
-                        <span class="efficiency">1,200 XP/min</span>
-                    </div>
-                </div>
-                <div class="quest-rank rank-s">S</div>
-                <div class="quest-badge">Event</div>
-            </div>
-            <div class="quest-card" data-delay="600">
-                <div class="quest-priority p4">4</div>
-                <div class="quest-info">
-                    <div class="quest-name">Storm Circle: Top 10 Finish (x2)</div>
-                    <div class="quest-meta">
-                        <span class="xp">+8,000 XP</span>
-                        <span class="time">14 min</span>
-                        <span class="efficiency">571 XP/min</span>
-                    </div>
-                </div>
-                <div class="quest-rank rank-b">B</div>
-                <div class="quest-badge">Progress</div>
-            </div>
-            <div class="quest-card" data-delay="800">
-                <div class="quest-priority p5">5</div>
-                <div class="quest-info">
-                    <div class="quest-name">Open Chests at Lavish Lair</div>
-                    <div class="quest-meta">
-                        <span class="xp">+5,000 XP</span>
-                        <span class="time">6 min</span>
-                        <span class="efficiency">833 XP/min</span>
-                    </div>
-                </div>
-                <div class="quest-rank rank-a">A</div>
-                <div class="quest-badge">Quick Win</div>
-            </div>
-        </div>
-        <p style="text-align:center; color: var(--text-muted); font-size: 0.8rem; margin-top: 24px;" class="fade-in">
-            Total: <strong style="color: var(--gold);">65,000 XP</strong> in <strong style="color: #fff;">60 minutes</strong> &mdash; ranked by efficiency
-        </p>
-    </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="container">
-    <div class="section-label fade-in">How It Works</div>
-    <h2 class="section-title fade-in">Three steps. Smarter sessions.</h2>
-    <p class="section-sub fade-in">No spreadsheets. No guessing. Just tell us your time and game.</p>
+    <h2 class="section-title">How it works</h2>
+    <p class="section-sub">Three steps to a smarter session.</p>
     <div class="steps">
-        <div class="step-card fade-in">
+        <div class="step">
             <div class="step-num">1</div>
-            <h3>Enter Your Time + Game</h3>
-            <p>"I have 45 minutes and I'm playing EAFC Ultimate Team." That's all QuestFrag needs.</p>
+            <h3>Tell us your time + game</h3>
+            <p>"I have 45 minutes and I'm playing EAFC Ultimate Team." That's all QuestFrag needs to get started.</p>
         </div>
-        <div class="step-card fade-in">
+        <div class="step">
             <div class="step-num">2</div>
-            <h3>Get Your Session Plan</h3>
-            <p>AI analyses live events, reward structures, and active quests to build a ranked action plan &mdash; highest value first.</p>
+            <h3>Get your optimal session plan</h3>
+            <p>Our AI analyses live events, reward structures, and your progress to build a ranked action plan.</p>
         </div>
-        <div class="step-card fade-in">
+        <div class="step">
             <div class="step-num">3</div>
-            <h3>Dominate Your Session</h3>
-            <p>Hit your goals faster, skip the busywork, and walk away knowing you maxed out every minute.</p>
+            <h3>Play smarter, not longer</h3>
+            <p>Hit your goals faster, skip the busywork, and actually enjoy your limited gaming time.</p>
         </div>
     </div>
 </section>
 
-<!-- SUPPORTED GAMES -->
 <section class="container">
-    <div class="section-label fade-in">Supported Games</div>
-    <h2 class="section-title fade-in">Built for the games you play</h2>
-    <p class="section-sub fade-in">Launch games first. More rolling out fast.</p>
-    <div class="games-grid">
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#127918;</span>
-            <div class="game-name">Fortnite</div>
-            <div class="game-status">Live</div>
+    <h2 class="section-title">Built for efficiency</h2>
+    <p class="section-sub">Every feature is designed to save you time.</p>
+    <div class="features">
+        <div class="feature">
+            <h3>Session Optimizer</h3>
+            <p>Input your available time and get a ranked action plan tailored to your current game state.</p>
         </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#9917;</span>
-            <div class="game-name">EAFC 25</div>
-            <div class="game-status">Live</div>
+        <div class="feature">
+            <h3>Live Assistant</h3>
+            <p>Stuck on a puzzle or challenge? Get real-time guidance without leaving your game.</p>
+            <span class="tag">Coming Soon</span>
         </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#127936;</span>
-            <div class="game-name">NBA 2K25</div>
-            <div class="game-status">Live</div>
-        </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#128663;</span>
-            <div class="game-name">Rocket League</div>
-            <div class="game-status soon">Coming Soon</div>
-        </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#128302;</span>
-            <div class="game-name">Destiny 2</div>
-            <div class="game-status soon">Coming Soon</div>
-        </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#9876;</span>
-            <div class="game-name">WoW</div>
-            <div class="game-status soon">Coming Soon</div>
-        </div>
-        <div class="game-tile fade-in">
-            <span class="game-icon">&#128293;</span>
-            <div class="game-name">Diablo 4</div>
-            <div class="game-status soon">Coming Soon</div>
+        <div class="feature">
+            <h3>Multi-Game Support</h3>
+            <p>Track objectives across multiple games and switch contexts seamlessly.</p>
+            <span class="tag">Coming Soon</span>
         </div>
     </div>
 </section>
 
-<!-- WAITLIST -->
-<section class="waitlist-section" id="waitlist">
-    <div class="container">
-        <div class="waitlist-box">
-            <div class="section-label fade-in">Early Access</div>
-            <h2 class="section-title fade-in">Get Early Access &mdash; Free</h2>
-            <p class="section-sub fade-in" style="margin-bottom: 32px;">Join the waitlist. Be first to play smarter when we launch.</p>
-            <form class="email-form fade-in" id="waitlistForm">
-                <input type="email" class="email-input" placeholder="Enter your email" required aria-label="Email address">
-                <button type="submit" class="email-submit">Join Waitlist</button>
-            </form>
-            <p class="form-note fade-in">Free forever during early access. No spam, ever.</p>
-            <p class="form-success" id="formSuccess">You're on the list. We'll be in touch.</p>
-        </div>
-    </div>
+<section class="container cta-section" id="waitlist">
+    <h2 class="section-title">Get early access</h2>
+    <p class="section-sub">Join the waitlist and be first to try QuestFrag when we launch.</p>
+    <a href="#" class="cta-btn">Get Early Access</a>
 </section>
 
-<!-- FOOTER -->
 <footer>
-    <div class="footer-logo">QuestFrag</div>
-    <p class="footer-text">&copy; 2026 QuestFrag &mdash; Built for gamers who don't have time to waste.</p>
+    <p><strong>QuestFrag</strong></p>
+    <p>&copy; 2026 QuestFrag — Built for gamers who don't have time to waste.</p>
 </footer>
-
-<script>
-/* ===== HEX GRID BACKGROUND ===== */
-(function() {
-    const canvas = document.getElementById('hexCanvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const hexSize = 40;
-    const cols = Math.ceil(w / (hexSize * 1.75)) + 2;
-    const rows = Math.ceil(h / (hexSize * 1.55)) + 2;
-
-    function drawHex(cx, cy, size, alpha) {
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i - Math.PI / 6;
-            const x = cx + size * Math.cos(angle);
-            const y = cy + size * Math.sin(angle);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.strokeStyle = 'rgba(255, 215, 0, ' + alpha + ')';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-    }
-
-    let time = 0;
-    function animate() {
-        ctx.clearRect(0, 0, w, h);
-        time += 0.003;
-
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                const x = col * hexSize * 1.75;
-                const y = row * hexSize * 1.55 + (col % 2 ? hexSize * 0.775 : 0);
-                const dist = Math.sqrt(Math.pow(x - w / 2, 2) + Math.pow(y - h / 2, 2));
-                const wave = Math.sin(dist * 0.003 - time) * 0.5 + 0.5;
-                const alpha = 0.015 + wave * 0.025;
-                drawHex(x, y, hexSize, alpha);
-            }
-        }
-        requestAnimationFrame(animate);
-    }
-    animate();
-})();
-
-/* ===== SCROLL FADE-IN ===== */
-(function() {
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-    document.querySelectorAll('.fade-in').forEach(function(el) {
-        observer.observe(el);
-    });
-})();
-
-/* ===== QUEST CARD SEQUENTIAL LOAD ===== */
-(function() {
-    const cards = document.querySelectorAll('.quest-card');
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                cards.forEach(function(card) {
-                    const delay = parseInt(card.getAttribute('data-delay')) || 0;
-                    setTimeout(function() {
-                        card.classList.add('loaded');
-                    }, delay + 300);
-                });
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.2 });
-
-    if (cards.length > 0) observer.observe(cards[0]);
-})();
-
-/* ===== WAITLIST FORM ===== */
-(function() {
-    var form = document.getElementById('waitlistForm');
-    var success = document.getElementById('formSuccess');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Analytics: track waitlist signup event
-            // gtag('event', 'waitlist_signup', { method: 'email' });
-            form.style.display = 'none';
-            success.style.display = 'block';
-        });
-    }
-})();
-</script>
 
 </body>
 </html>
-   
- 
