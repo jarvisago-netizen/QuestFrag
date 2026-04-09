@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuestFrag — XP Quest Planner</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;padding:16px}
+h1{text-align:center;font-size:1.6rem;color:#FFD700;margin:12px 0 4px;letter-spacing:1px}
+.subtitle{text-align:center;font-size:.85rem;color:#888;margin-bottom:24px}
+.section-label{font-size:.75rem;text-transform:uppercase;letter-spacing:2px;color:#666;margin-bottom:8px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.btn{flex:1;min-width:70px;padding:14px 10px;border:2px solid #222;border-radius:10px;background:#111;color:#ccc;font-size:.95rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.btn:hover{border-color:#555}
+.btn.active{border-color:#FFD700;color:#FFD700;background:#1a1a10;box-shadow:0 0 12px rgba(255,215,0,.15)}
+.results-header{display:flex;justify-content:space-between;align-items:baseline;margin:28px 0 12px}
+.results-header h2{font-size:1.1rem;color:#ddd}
+.results-header .total{font-size:.85rem;color:#FFD700}
+.quest-card{background:#111;border:1px solid #1e1e2a;border-radius:12px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:border-color .15s}
+.quest-card:hover{border-color:#333}
+.quest-info{flex:1;min-width:0}
+.quest-name{font-size:.95rem;font-weight:600;color:#eee;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quest-meta{display:flex;gap:12px;font-size:.78rem;color:#777}
+.quest-meta span{white-space:nowrap}
+.quest-stats{text-align:right;flex-shrink:0}
+.quest-xp{font-size:1.1rem;font-weight:700;color:#FFD700}
+.quest-rate{font-size:.75rem;color:#888;margin-top:2px}
+.badge{display:inline-block;font-size:.65rem;padding:2px 7px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:6px;vertical-align:middle}
+.badge-weekly{background:#1a2a1a;color:#4a4}
+.badge-daily{background:#2a2a1a;color:#aa4}
+.badge-milestone{background:#1a1a2a;color:#66f}
+.empty{text-align:center;color:#555;padding:40px 0;font-size:.9rem}
+.rank{font-size:1.2rem;font-weight:700;color:#333;margin-right:12px;min-width:24px;text-align:center}
+</style>
+</head>
+<body>
+
+<h1>QUESTFRAG</h1>
+<p class="subtitle">XP Quest Planner</p>
+
+<div class="section-label">How much time?</div>
+<div class="btn-row" id="timeRow">
+  <button class="btn active" data-time="30">30 min</button>
+  <button class="btn" data-time="60">1 hr</button>
+  <button class="btn" data-time="120">2 hr</button>
+  <button class="btn" data-time="180">3 hr+</button>
+</div>
+
+<div class="section-label">What's the vibe?</div>
+<div class="btn-row" id="goalRow">
+  <button class="btn active" data-goal="xp">XP Grind</button>
+  <button class="btn" data-goal="battlepass">Battle Pass</button>
+  <button class="btn" data-goal="chill">Chill</button>
+</div>
+
+<div class="results-header">
+  <h2>Your Quest Plan</h2>
+  <span class="total" id="totalXp"></span>
+</div>
+<div id="results"></div>
+
+<script>
+const QUESTS=[
+{id:1,name:"Deal damage to opponents",type:"weekly",xp:15000,timeMinutes:8,goal:"xp"},
+{id:2,name:"Collect resources (wood/stone/metal)",type:"weekly",xp:15000,timeMinutes:5,goal:"xp"},
+{id:3,name:"Open chests or ammo boxes",type:"weekly",xp:15000,timeMinutes:6,goal:"xp"},
+{id:4,name:"Travel distance in a vehicle",type:"weekly",xp:15000,timeMinutes:4,goal:"xp"},
+{id:5,name:"Eliminate opponents in named locations",type:"weekly",xp:15000,timeMinutes:15,goal:"battlepass"},
+{id:6,name:"Search chests at specific POI",type:"weekly",xp:15000,timeMinutes:6,goal:"xp"},
+{id:7,name:"Survive storm circles",type:"weekly",xp:15000,timeMinutes:20,goal:"battlepass"},
+{id:8,name:"Complete a daily quest",type:"daily",xp:7000,timeMinutes:5,goal:"chill"},
+{id:9,name:"Visit different named locations",type:"weekly",xp:15000,timeMinutes:12,goal:"battlepass"},
+{id:10,name:"Reach top 25 in a solo match",type:"milestone",xp:50000,timeMinutes:20,goal:"battlepass"}
+];
+
+let selectedTime=30,selectedGoal="xp";
+
+function setup(rowId,key,setter){
+  const row=document.getElementById(rowId);
+  row.addEventListener("click",function(e){
+    const btn=e.target.closest(".btn");
+    if(!btn)return;
+    row.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    setter(btn.dataset[key]);
+    render();
+  });
+}
+setup("timeRow","time",v=>{selectedTime=+v});
+setup("goalRow","goal",v=>{selectedGoal=v});
+
+function render(){
+  let sorted;
+  if(selectedGoal==="xp"){
+    sorted=[...QUESTS].sort((a,b)=>(b.xp/b.timeMinutes)-(a.xp/a.timeMinutes));
+  }else if(selectedGoal==="battlepass"){
+    const priority={milestone:0,weekly:1,daily:2};
+    sorted=[...QUESTS].sort((a,b)=>{
+      const pa=priority[a.type]??9,pb=priority[b.type]??9;
+      if(pa!==pb)return pa-pb;
+      return(b.xp/b.timeMinutes)-(a.xp/a.timeMinutes);
+    });
+  }else{
+    sorted=[...QUESTS].sort((a,b)=>a.timeMinutes-b.timeMinutes);
+  }
+
+  let timeLeft=selectedTime,picked=[];
+  for(const q of sorted){
+    if(q.timeMinutes<=timeLeft){
+      picked.push(q);
+      timeLeft-=q.timeMinutes;
+      if(picked.length>=8)break;
+    }
+  }
+
+  const el=document.getElementById("results");
+  const totalEl=document.getElementById("totalXp");
+  if(!picked.length){
+    el.innerHTML='<div class="empty">No quests fit this time window</div>';
+    totalEl.textContent="";
+    return;
+  }
+  const totalXp=picked.reduce((s,q)=>s+q.xp,0);
+  const totalMin=picked.reduce((s,q)=>s+q.timeMinutes,0);
+  totalEl.textContent=totalXp.toLocaleString()+" XP in ~"+totalMin+"min";
+
+  el.innerHTML=picked.map((q,i)=>{
+    const rate=(q.xp/q.timeMinutes).toFixed(0);
+    const bc=q.type==="weekly"?"weekly":q.type==="daily"?"daily":"milestone";
+    return'<div class="quest-card"><span class="rank">'+(i+1)+'</span><div class="quest-info"><div class="quest-name">'+q.name+'<span class="badge badge-'+bc+'">'+q.type+'</span></div><div class="quest-meta"><span>'+q.timeMinutes+' min</span><span>'+rate+' XP/min</span></div></div><div class="quest-stats"><div class="quest-xp">'+q.xp.toLocaleString()+' XP</div></div></div>';
+  }).join("");
+}
+render();
+</script>
+</body>
+</html>

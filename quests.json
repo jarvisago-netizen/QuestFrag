@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "season": "Chapter 6 Season 2",
+    "generated": "2026-04-08T22:55:46.209Z",
+    "source": "placeholder (API unavailable)",
+    "note": "Run this script weekly after Fortnite quest reset (Monday ~10AM AEST)"
+  },
+  "quests": [
+    {
+      "id": 4,
+      "name": "Travel distance in a vehicle",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 4,
+      "tags": [
+        "vehicle"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 2,
+      "name": "Collect resources (wood/stone/metal)",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 5,
+      "tags": [
+        "gathering"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 3,
+      "name": "Open chests or ammo boxes",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 6,
+      "tags": [
+        "looting"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 6,
+      "name": "Search chests at specific POI",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 6,
+      "tags": [
+        "looting",
+        "exploration"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 10,
+      "name": "Reach top 25 in a solo match",
+      "type": "milestone",
+      "xp": 50000,
+      "timeMinutes": 20,
+      "tags": [
+        "survival"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 1,
+      "name": "Deal damage to opponents (any weapon)",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 8,
+      "tags": [
+        "combat"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 8,
+      "name": "Complete a daily quest",
+      "type": "daily",
+      "xp": 7000,
+      "timeMinutes": 5,
+      "tags": [
+        "combat"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 9,
+      "name": "Visit different named locations in a single match",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 12,
+      "tags": [
+        "exploration"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 5,
+      "name": "Eliminate opponents in named locations",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 15,
+      "tags": [
+        "combat",
+        "exploration"
+      ],
+      "goal": "xp"
+    },
+    {
+      "id": 7,
+      "name": "Survive storm circles",
+      "type": "weekly",
+      "xp": 15000,
+      "timeMinutes": 20,
+      "tags": [
+        "survival"
+      ],
+      "goal": "xp"
+    }
+  ]
+}
